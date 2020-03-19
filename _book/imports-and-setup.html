@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Imports and Setup | Cyborg Math Final Project</title>
+  <meta name="description" content="We work through the tight-coupling approximation of the early universe." />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Imports and Setup | Cyborg Math Final Project" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="We work through the tight-coupling approximation of the early universe." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Imports and Setup | Cyborg Math Final Project" />
+  
+  <meta name="twitter:description" content="We work through the tight-coupling approximation of the early universe." />
+  
+
+<meta name="author" content="Nathaniel Starkman" />
+
+
+<meta name="date" content="2020-03-19" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="definitions.html"/>
+<script src="libs/header-attrs-2.1/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+<script>
+/* ========================================================================
+ * Bootstrap: transition.js v3.3.7
+ * http://getbootstrap.com/javascript/#transitions
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
+  // ============================================================
+
+  function transitionEnd() {
+    var el = document.createElement('bootstrap')
+
+    var transEndEventNames = {
+      WebkitTransition : 'webkitTransitionEnd',
+      MozTransition    : 'transitionend',
+      OTransition      : 'oTransitionEnd otransitionend',
+      transition       : 'transitionend'
+    }
+
+    for (var name in transEndEventNames) {
+      if (el.style[name] !== undefined) {
+        return { end: transEndEventNames[name] }
+      }
+    }
+
+    return false // explicit for ie8 (  ._.)
+  }
+
+  // http://blog.alexmaccaw.com/css-transitions
+  $.fn.emulateTransitionEnd = function (duration) {
+    var called = false
+    var $el = this
+    $(this).one('bsTransitionEnd', function () { called = true })
+    var callback = function () { if (!called) $($el).trigger($.support.transition.end) }
+    setTimeout(callback, duration)
+    return this
+  }
+
+  $(function () {
+    $.support.transition = transitionEnd()
+
+    if (!$.support.transition) return
+
+    $.event.special.bsTransitionEnd = {
+      bindType: $.support.transition.end,
+      delegateType: $.support.transition.end,
+      handle: function (e) {
+        if ($(e.target).is(this)) return e.handleObj.handler.apply(this, arguments)
+      }
+    }
+  })
+
+}(jQuery);
+</script>
+<script>
+/* ========================================================================
+ * Bootstrap: collapse.js v3.3.7
+ * http://getbootstrap.com/javascript/#collapse
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+/* jshint latedef: false */
+
++function ($) {
+  'use strict';
+
+  // COLLAPSE PUBLIC CLASS DEFINITION
+  // ================================
+
+  var Collapse = function (element, options) {
+    this.$element      = $(element)
+    this.options       = $.extend({}, Collapse.DEFAULTS, options)
+    this.$trigger      = $('[data-toggle="collapse"][href="#' + element.id + '"],' +
+                           '[data-toggle="collapse"][data-target="#' + element.id + '"]')
+    this.transitioning = null
+
+    if (this.options.parent) {
+      this.$parent = this.getParent()
+    } else {
+      this.addAriaAndCollapsedClass(this.$element, this.$trigger)
+    }
+
+    if (this.options.toggle) this.toggle()
+  }
+
+  Collapse.VERSION  = '3.3.7'
+
+  Collapse.TRANSITION_DURATION = 350
+
+  Collapse.DEFAULTS = {
+    toggle: true
+  }
+
+  Collapse.prototype.dimension = function () {
+    var hasWidth = this.$element.hasClass('width')
+    return hasWidth ? 'width' : 'height'
+  }
+
+  Collapse.prototype.show = function () {
+    if (this.transitioning || this.$element.hasClass('in')) return
+
+    var activesData
+    var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
+
+    if (actives && actives.length) {
+      activesData = actives.data('bs.collapse')
+      if (activesData && activesData.transitioning) return
+    }
+
+    var startEvent = $.Event('show.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    if (actives && actives.length) {
+      Plugin.call(actives, 'hide')
+      activesData || actives.data('bs.collapse', null)
+    }
+
+    var dimension = this.dimension()
+
+    this.$element
+      .removeClass('collapse')
+      .addClass('collapsing')[dimension](0)
+      .attr('aria-expanded', true)
+
+    this.$trigger
+      .removeClass('collapsed')
+      .attr('aria-expanded', true)
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.$element
+        .removeClass('collapsing')
+        .addClass('collapse in')[dimension]('')
+      this.transitioning = 0
+      this.$element
+        .trigger('shown.bs.collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    var scrollSize = $.camelCase(['scroll', dimension].join('-'))
+
+    this.$element
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)[dimension](this.$element[0][scrollSize])
+  }
+
+  Collapse.prototype.hide = function () {
+    if (this.transitioning || !this.$element.hasClass('in')) return
+
+    var startEvent = $.Event('hide.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    var dimension = this.dimension()
+
+    this.$element[dimension](this.$element[dimension]())[0].offsetHeight
+
+    this.$element
+      .addClass('collapsing')
+      .removeClass('collapse in')
+      .attr('aria-expanded', false)
+
+    this.$trigger
+      .addClass('collapsed')
+      .attr('aria-expanded', false)
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.transitioning = 0
+      this.$element
+        .removeClass('collapsing')
+        .addClass('collapse')
+        .trigger('hidden.bs.collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    this.$element
+      [dimension](0)
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)
+  }
+
+  Collapse.prototype.toggle = function () {
+    this[this.$element.hasClass('in') ? 'hide' : 'show']()
+  }
+
+  Collapse.prototype.getParent = function () {
+    return $(this.options.parent)
+      .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
+      .each($.proxy(function (i, element) {
+        var $element = $(element)
+        this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
+      }, this))
+      .end()
+  }
+
+  Collapse.prototype.addAriaAndCollapsedClass = function ($element, $trigger) {
+    var isOpen = $element.hasClass('in')
+
+    $element.attr('aria-expanded', isOpen)
+    $trigger
+      .toggleClass('collapsed', !isOpen)
+      .attr('aria-expanded', isOpen)
+  }
+
+  function getTargetFromTrigger($trigger) {
+    var href
+    var target = $trigger.attr('data-target')
+      || (href = $trigger.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
+
+    return $(target)
+  }
+
+
+  // COLLAPSE PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.collapse')
+      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
+
+      if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
+      if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.collapse
+
+  $.fn.collapse             = Plugin
+  $.fn.collapse.Constructor = Collapse
+
+
+  // COLLAPSE NO CONFLICT
+  // ====================
+
+  $.fn.collapse.noConflict = function () {
+    $.fn.collapse = old
+    return this
+  }
+
+
+  // COLLAPSE DATA-API
+  // =================
+
+  $(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+    var $this   = $(this)
+
+    if (!$this.attr('data-target')) e.preventDefault()
+
+    var $target = getTargetFromTrigger($this)
+    var data    = $target.data('bs.collapse')
+    var option  = data ? 'toggle' : $this.data()
+
+    Plugin.call($target, option)
+  })
+
+}(jQuery);
+</script>
+<script>
+window.initializeCodeFolding = function(show) {
+
+  // handlers for show-all and hide all
+  $("#rmd-show-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('show');
+    });
+  });
+  $("#rmd-hide-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('hide');
+    });
+  });
+
+  // index for unique code element ids
+  var currentIndex = 1;
+
+  // select all R code blocks
+  var rCodeBlocks = $('pre.sourceCode, pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan');
+  rCodeBlocks.each(function() {
+
+    // create a collapsable div to wrap the code in
+    var div = $('<div class="collapse r-code-collapse"></div>');
+    if (show)
+      div.addClass('in');
+    var id = 'rcode-643E0F36' + currentIndex++;
+    div.attr('id', id);
+    $(this).before(div);
+    $(this).detach().appendTo(div);
+
+    // add a show code button right above
+    var showCodeText = $('<span>' + (show ? 'Hide' : 'Code') + '</span>');
+    var showCodeButton = $('<button type="button" class="btn btn-default btn-xs code-folding-btn pull-right"></button>');
+    showCodeButton.append(showCodeText);
+    showCodeButton
+        .attr('data-toggle', 'collapse')
+        .attr('data-target', '#' + id)
+        .attr('aria-expanded', show)
+        .attr('aria-controls', id);
+
+    var buttonRow = $('<div class="row"></div>');
+    var buttonCol = $('<div class="col-md-12"></div>');
+
+    buttonCol.append(showCodeButton);
+    buttonRow.append(buttonCol);
+
+    div.before(buttonRow);
+
+    // update state of button on show/hide
+    div.on('hidden.bs.collapse', function () {
+      showCodeText.text('Code');
+    });
+    div.on('show.bs.collapse', function () {
+      showCodeText.text('Hide');
+    });
+  });
+
+}
+</script>
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+.row { display: flex; }
+.collapse { display: none; }
+.in { display:block }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Cyborg Math Final Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="imports-and-setup.html"><a href="imports-and-setup.html"><i class="fa fa-check"></i><b>2</b> Imports and Setup</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="imports-and-setup.html"><a href="imports-and-setup.html#imports"><i class="fa fa-check"></i><b>2.1</b> Imports</a></li>
+<li class="chapter" data-level="2.2" data-path="imports-and-setup.html"><a href="imports-and-setup.html#symbols"><i class="fa fa-check"></i><b>2.2</b> Symbols and Sympy Functions</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="imports-and-setup.html"><a href="imports-and-setup.html#variable-details"><i class="fa fa-check"></i><b>2.2.1</b> Variable Details</a></li>
+<li class="chapter" data-level="2.2.2" data-path="imports-and-setup.html"><a href="imports-and-setup.html#dummy-variables"><i class="fa fa-check"></i><b>2.2.2</b> Dummy Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="imports-and-setup.html"><a href="imports-and-setup.html#relations"><i class="fa fa-check"></i><b>2.3</b> Relations</a></li>
+<li class="chapter" data-level="2.4" data-path="imports-and-setup.html"><a href="imports-and-setup.html#passing-variables"><i class="fa fa-check"></i><b>2.4</b> Passing Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="definitions.html"><a href="definitions.html"><i class="fa fa-check"></i><b>3</b> Definitions</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="definitions.html"><a href="definitions.html#fluctuation-multipole-expansion"><i class="fa fa-check"></i><b>3.1</b> Fluctuation Multipole Expansion</a></li>
+<li class="chapter" data-level="3.2" data-path="definitions.html"><a href="definitions.html#zaldarriaga1995-2.6"><i class="fa fa-check"></i><b>3.2</b> <span class="citation">Zaldarriaga and Harari (<span>1995</span>)</span> (2.6)</a></li>
+<li class="chapter" data-level="3.3" data-path="definitions.html"><a href="definitions.html#all-order-delta_t-relation"><i class="fa fa-check"></i><b>3.3</b> All-order <span class="math inline">\(\Delta_T\)</span> relation</a></li>
+<li class="chapter" data-level="3.4" data-path="definitions.html"><a href="definitions.html#passing-variables-1"><i class="fa fa-check"></i><b>3.4</b> Passing Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="zeroth-order-solution.html"><a href="zeroth-order-solution.html"><i class="fa fa-check"></i><b>4</b> Zeroth-Order Solution</a></li>
+<li class="chapter" data-level="5" data-path="first-order-solution.html"><a href="first-order-solution.html"><i class="fa fa-check"></i><b>5</b> First Order Solution</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="6" data-path="appendix.html"><a href="appendix.html"><i class="fa fa-check"></i><b>6</b> Appendix</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="appendix.html"><a href="appendix.html#app:legendre_products"><i class="fa fa-check"></i><b>6.1</b> Legendre Products</a></li>
+<li class="chapter" data-level="6.2" data-path="appendix.html"><a href="appendix.html#app:approx"><i class="fa fa-check"></i><b>6.2</b> Approximations</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="appendix.html"><a href="appendix.html#sub:r_and_a"><i class="fa fa-check"></i><b>6.2.1</b> R and a</a></li>
+</ul></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Cyborg Math Final Project</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="imports-and-setup" class="section level1" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Imports and Setup</h1>
+<p>Each chapter includes the following code block, which is used to set the python environment. This should be changed to <em>your</em> python path to be run.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="imports-and-setup.html#cb1-1"></a><span class="kw">library</span>(reticulate)</span>
+<span id="cb1-2"><a href="imports-and-setup.html#cb1-2"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb1-3"><a href="imports-and-setup.html#cb1-3"></a>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">engine.path=</span><span class="st">&#39;/Users/nathanielstarkman/miniconda3/bin/python3.7&#39;</span>)</span></code></pre></div>
+<p>The following imports and definitions may be found in the <code>src</code> folder of this project. They are included here for easy perusal, but are imported in each chapter with the following code block (hidden in chapters)</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="imports-and-setup.html#cb2-1"></a><span class="im">from</span> src <span class="im">import</span> <span class="op">*</span></span></code></pre></div>
+<div id="imports" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Imports</h2>
+<p>These are the important imports from <code>src</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="imports-and-setup.html#cb3-1"></a><span class="im">import</span> pickle</span>
+<span id="cb3-2"><a href="imports-and-setup.html#cb3-2"></a></span>
+<span id="cb3-3"><a href="imports-and-setup.html#cb3-3"></a><span class="im">import</span> sympy <span class="im">as</span> sp</span>
+<span id="cb3-4"><a href="imports-and-setup.html#cb3-4"></a><span class="im">from</span> sympy <span class="im">import</span> pprint, Symbol, init_printing</span>
+<span id="cb3-5"><a href="imports-and-setup.html#cb3-5"></a></span>
+<span id="cb3-6"><a href="imports-and-setup.html#cb3-6"></a>init_printing()</span>
+<span id="cb3-7"><a href="imports-and-setup.html#cb3-7"></a></span>
+<span id="cb3-8"><a href="imports-and-setup.html#cb3-8"></a><span class="im">from</span> src.parameters <span class="im">import</span> (  <span class="co"># Parameters</span></span>
+<span id="cb3-9"><a href="imports-and-setup.html#cb3-9"></a>    <span class="co"># dummy&#39;s</span></span>
+<span id="cb3-10"><a href="imports-and-setup.html#cb3-10"></a>    dummyL, dummyO, dummyMinus, dummyZero, dummyPlus,</span>
+<span id="cb3-11"><a href="imports-and-setup.html#cb3-11"></a>    legendre_products_constants,</span>
+<span id="cb3-12"><a href="imports-and-setup.html#cb3-12"></a>    <span class="co"># variables</span></span>
+<span id="cb3-13"><a href="imports-and-setup.html#cb3-13"></a>    tau, tau0, mu, l, k, lge2, lge3,</span>
+<span id="cb3-14"><a href="imports-and-setup.html#cb3-14"></a>)</span>
+<span id="cb3-15"><a href="imports-and-setup.html#cb3-15"></a></span>
+<span id="cb3-16"><a href="imports-and-setup.html#cb3-16"></a><span class="im">from</span> .parameters <span class="im">import</span> (LgP, DeltaT, DeltaP)  <span class="co"># Functions to Make Parameters</span></span></code></pre></div>
+</div>
+<div id="symbols" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Symbols and Sympy Functions</h2>
+<p>There are many variables. Here is a table, in alphabetical order.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th align="center">Symbol</th>
+<th align="right">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>tau</code></td>
+<td align="center"><span class="math inline">\(\tau\)</span></td>
+<td align="right">conformal time / distance</td>
+</tr>
+<tr class="even">
+<td><code>tau0</code></td>
+<td align="center"><span class="math inline">\(\tau_0\)</span></td>
+<td align="right">current conformal time</td>
+</tr>
+<tr class="odd">
+<td><code>mu</code></td>
+<td align="center"><span class="math inline">\(\mu\)</span></td>
+<td align="right">angle</td>
+</tr>
+<tr class="even">
+<td><code>l</code></td>
+<td align="center"><span class="math inline">\(\ell\)</span></td>
+<td align="right">Legendre <span class="math inline">\(\ell\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>k</code></td>
+<td align="center"><span class="math inline">\(k\)</span></td>
+<td align="right">vector</td>
+</tr>
+<tr class="even">
+<td><code>dummyL</code></td>
+<td align="center"><span class="math inline">\(\ell\)</span></td>
+<td align="right">dummy Legendre <span class="math inline">\(\ell\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>dummyO</code></td>
+<td align="center"><span class="math inline">\(\mathcal{O}\)</span></td>
+<td align="right">dummy Taylor expansion order</td>
+</tr>
+<tr class="even">
+<td><code>tauc</code></td>
+<td align="center"><span class="math inline">\(\tau_C(\tau)\)</span></td>
+<td align="right">inverse of Thompson scatter rate</td>
+</tr>
+<tr class="odd">
+<td><code>kappa</code></td>
+<td align="center"><span class="math inline">\(\kappa(\tau)\)</span></td>
+<td align="right">Thompson scattering</td>
+</tr>
+<tr class="even">
+<td><code>dkappa</code></td>
+<td align="center"><span class="math inline">\(\dot{\kappa}(\tau)\)</span></td>
+<td align="right">Thompson scattering rate</td>
+</tr>
+<tr class="odd">
+<td><code>a</code></td>
+<td align="center"><span class="math inline">\(a(\tau)\)</span></td>
+<td align="right">scale factor</td>
+</tr>
+<tr class="even">
+<td><code>R</code></td>
+<td align="center"><span class="math inline">\(R(\tau)\)</span></td>
+<td align="right"><span class="math inline">\(\frac{3\rho_b}{4\rho_\gamma}\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>Psi</code>, <code>Phi</code></td>
+<td align="center"><span class="math inline">\(\Psi\)</span>, <span class="math inline">\(\Phi\)</span></td>
+<td align="right">Bardeen potential</td>
+</tr>
+<tr class="even">
+<td><code>DT</code></td>
+<td align="center"><span class="math inline">\(\Delta_T\)</span></td>
+<td align="right">temperature fluctuation</td>
+</tr>
+<tr class="odd">
+<td><code>DP</code></td>
+<td align="center"><span class="math inline">\(\Delta_P\)</span></td>
+<td align="right">Polarization fluctuation</td>
+</tr>
+<tr class="even">
+<td><code>Sx</code></td>
+<td align="center"><span class="math inline">\(S_{TP}(\tau)\)</span></td>
+<td align="right"><span class="math inline">\(\Delta_{T2} + \Delta_{P2} - \Delta_{P0}\)</span></td>
+</tr>
+</tbody>
+</table>
+<!-- TODO? Do the table programattically from the namespacce -->
+<div id="variable-details" class="section level3" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Variable Details</h3>
+<p>Many of the variables have both order expansions in powers of <code>tauc</code> as well as multipole expansions in <code>l</code>. Additionally, many variables are implicitly functions of <code>tau</code>. In order to make reading these variables easier, they have been implemented using a custom Sympy function class that overloads the base LaTeX functionality. As example, <code>a</code> is <span class="math inline">\(a(\tau)\)</span>, but will appear as <span class="math inline">\(a\)</span> unless its argument is substituted to another variable (<span class="math inline">\(a(x)\)</span> would appear as is). Similarly, <code>DT</code> is <span class="math inline">\(\Delta_{T,\rm{multipole}}^{(\rm{order})}(\tau)\)</span> but shows as <span class="math inline">\(\Delta_T\)</span> unless the order, multipole or argument are changed. When the order or multipole do NOT appear, it means <code>DT</code> for ALL orders and/or multipoles.</p>
+<p>Besides overloading the LaTeX functionality, some functions, such as <code>LgP</code> and <code>DP</code> have custom <code>.doit()</code> methods and arguments to prevent their being expanded by their definitions (see next section).</p>
+</div>
+<div id="dummy-variables" class="section level3" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Dummy Variables</h3>
+<p>Dummy variables are used in function construction as a stand-in for unspecified values. This is done to protect variables from improper substitutions.</p>
+<p>Some of the dummy variables used in this paper are:</p>
+<ul>
+<li>Legendre degree <span class="math inline">\(l\)</span>:</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="imports-and-setup.html#cb4-1"></a>dummyL <span class="op">=</span> Symbol(<span class="vs">r&quot;\mathcal{\ell}&quot;</span>)  <span class="co"># Legendre l</span></span></code></pre></div>
+<ul>
+<li>Taylor expansion order <span class="math inline">\(\mathcal{O}\)</span>:</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="imports-and-setup.html#cb5-1"></a>dummyO <span class="op">=</span> Symbol(<span class="vs">r&quot;\mathcal</span><span class="sc">{O}</span><span class="vs">&quot;</span>)  <span class="co"># order</span></span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="relations" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Relations</h2>
+<p>Sympy has powerful symbolic substutitution capabilities. We store relations and particular solutions in dictionaries for fast access and Sympy compatibilty.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="imports-and-setup.html#cb6-1"></a></span>
+<span id="cb6-2"><a href="imports-and-setup.html#cb6-2"></a>rels <span class="op">=</span> {</span>
+<span id="cb6-3"><a href="imports-and-setup.html#cb6-3"></a>    Sx : DT_a_2 <span class="op">+</span> DP_a_2 <span class="op">-</span> DP_a_0,</span>
+<span id="cb6-4"><a href="imports-and-setup.html#cb6-4"></a>    tauc: <span class="dv">1</span><span class="op">/</span>dkappa</span>
+<span id="cb6-5"><a href="imports-and-setup.html#cb6-5"></a><span class="co">#     R : </span></span>
+<span id="cb6-6"><a href="imports-and-setup.html#cb6-6"></a>}</span>
+<span id="cb6-7"><a href="imports-and-setup.html#cb6-7"></a></span>
+<span id="cb6-8"><a href="imports-and-setup.html#cb6-8"></a>sols <span class="op">=</span> {}  <span class="co"># general solutions</span></span>
+<span id="cb6-9"><a href="imports-and-setup.html#cb6-9"></a></span>
+<span id="cb6-10"><a href="imports-and-setup.html#cb6-10"></a>sols_0 <span class="op">=</span> {}  <span class="co"># 0th order solution</span></span>
+<span id="cb6-11"><a href="imports-and-setup.html#cb6-11"></a>sols_1 <span class="op">=</span> {}  <span class="co"># 1st order solution</span></span></code></pre></div>
+<hr />
+</div>
+<div id="passing-variables" class="section level2" number="2.4">
+<h2><span class="header-section-number">2.4</span> Passing Variables</h2>
+<p>Storing variables and relations for later chapters.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="imports-and-setup.html#cb7-1"></a><span class="bu">vars</span> <span class="op">=</span> {}</span>
+<span id="cb7-2"><a href="imports-and-setup.html#cb7-2"></a></span>
+<span id="cb7-3"><a href="imports-and-setup.html#cb7-3"></a><span class="co"># save variables</span></span>
+<span id="cb7-4"><a href="imports-and-setup.html#cb7-4"></a><span class="bu">vars</span>[<span class="st">&#39;rels&#39;</span>] <span class="op">=</span> rels</span>
+<span id="cb7-5"><a href="imports-and-setup.html#cb7-5"></a><span class="bu">vars</span>[<span class="st">&#39;sols&#39;</span>] <span class="op">=</span> sols</span>
+<span id="cb7-6"><a href="imports-and-setup.html#cb7-6"></a><span class="bu">vars</span>[<span class="st">&#39;sols_0&#39;</span>] <span class="op">=</span> sols_0</span>
+<span id="cb7-7"><a href="imports-and-setup.html#cb7-7"></a><span class="bu">vars</span>[<span class="st">&#39;sols_1&#39;</span>] <span class="op">=</span> sols_1</span>
+<span id="cb7-8"><a href="imports-and-setup.html#cb7-8"></a></span>
+<span id="cb7-9"><a href="imports-and-setup.html#cb7-9"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">&#39;src/pickled/01.pkl&#39;</span>, <span class="st">&#39;wb&#39;</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb7-10"><a href="imports-and-setup.html#cb7-10"></a>    pickle.dump(<span class="bu">vars</span>, <span class="bu">file</span>)</span></code></pre></div>
+<!-- You can write citations, too. For example, we are using the **bookdown** package [@R-bookdown] in this sample book, which was built on top of R Markdown and **knitr** [@xie2015]. -->
+
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="imports-and-setup.html#cb8-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">&#39;src/pickled/01.pkl&#39;</span>, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb8-2"><a href="imports-and-setup.html#cb8-2"></a>    <span class="bu">vars</span> <span class="op">=</span> pickle.load(<span class="bu">file</span>)</span>
+<span id="cb8-3"><a href="imports-and-setup.html#cb8-3"></a></span>
+<span id="cb8-4"><a href="imports-and-setup.html#cb8-4"></a>rels <span class="op">=</span> <span class="bu">vars</span>[<span class="st">&#39;rels&#39;</span>]</span>
+<span id="cb8-5"><a href="imports-and-setup.html#cb8-5"></a>sols <span class="op">=</span> <span class="bu">vars</span>[<span class="st">&#39;sols&#39;</span>]</span>
+<span id="cb8-6"><a href="imports-and-setup.html#cb8-6"></a>sols_0 <span class="op">=</span> <span class="bu">vars</span>[<span class="st">&#39;sols_0&#39;</span>]</span>
+<span id="cb8-7"><a href="imports-and-setup.html#cb8-7"></a>sols_1 <span class="op">=</span> <span class="bu">vars</span>[<span class="st">&#39;sols_1&#39;</span>]</span></code></pre></div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="definitions.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["final_project.pdf", "final_project.epub"],
+"toc": {
+"collapse": "subsection"
+},
+"code_folding": "hide"
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
