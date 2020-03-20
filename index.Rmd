@@ -38,6 +38,7 @@ opts_chunk$set(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7'
 ```
 
 
+
 ```{r bib-database, echo=FALSE, include=FALSE}
 # automatically create a bib database for R packages
 knitr::write_bib(c(
