@@ -1,35 +1,33 @@
-```{r include=FALSE}
-# Add a common class name for every chunks
-knitr::opts_chunk$set(echo = TRUE)
-library(reticulate)
-library(knitr)
-opts_chunk$set(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7')
-```
+# 03-zeroth\_order
 
+\`\`\`{r include=FALSE}
+
+## Add a common class name for every chunks
+
+knitr::opts\_chunk$set\(echo = TRUE\) library\(reticulate\) library\(knitr\) opts\_chunk$set\(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7'\)
+
+```text
 ```{python, echo=F, eval=T}
 from src import *
 ```
 
+## Zeroth-Order Solution
 
-# Zeroth-Order Solution
-(@Zaldarriaga1995 (2.7))
+\(@Zaldarriaga1995 \(2.7\)\)
 
-```{python, echo=T, eval=T}
-# loading
-with open('src/pickled/02.pkl', 'rb') as file:
-    vars = pickle.load(file)
+\`\`\`{python, echo=T, eval=T}
 
-DeltaTDef = vars['DeltaTDef']
-DeltaPDef = vars['DeltaPDef']
+## loading
 
-EqT = vars['EqT']
-EqP = vars['EqP']
-EqV = vars['EqV']
+with open\('src/pickled/02.pkl', 'rb'\) as file: vars = pickle.load\(file\)
 
-aniT0to1 = vars['aniT0to1']
-tex_aniT0to1 = vars['tex_aniT0to1']
-```
+DeltaTDef = vars\['DeltaTDef'\] DeltaPDef = vars\['DeltaPDef'\]
 
+EqT = vars\['EqT'\] EqP = vars\['EqP'\] EqV = vars\['EqV'\]
+
+aniT0to1 = vars\['aniT0to1'\] tex\_aniT0to1 = vars\['tex\_aniT0to1'\]
+
+```text
 Solving Z\&H95 (2.6) at 0th order. The terms on the right go to 0.
 
 ```{python}
@@ -38,12 +36,9 @@ EqP_O0 = sp.Eq(EqP.lhs.subs(dummyO, 0), 0)
 EqV_O0 = sp.Eq(EqV.lhs.subs(dummyO, 0), 0)
 ```
 
-```{python, echo=FALSE}
-tex_EqT_O0 = sp.latex(EqT_O0).replace('=', '&=')
-tex_EqP_O0 = sp.latex(EqP_O0).replace('=', '&=')
-tex_EqV_O0 = sp.latex(EqV_O0).replace('=', '&=')
-```
+\`\`\`{python, echo=FALSE} tex\_EqT\_O0 = sp.latex\(EqT\_O0\).replace\('=', '&='\) tex\_EqP\_O0 = sp.latex\(EqP\_O0\).replace\('=', '&='\) tex\_EqV\_O0 = sp.latex\(EqV\_O0\).replace\('=', '&='\)
 
+```text
 \begin{align}
     `r py$tex_EqT_O0` & (\#eq:O0T) \\
     `r py$tex_EqP_O0` & (\#eq:O0P) \\
@@ -57,10 +52,9 @@ We have already derived Z\&H95's relation $`r py$tex_aniT0to1`$ above -- the mid
 aniT0to1_O0 = aniT0to1.subs(dummyO, 0)
 ```
 
-```{python, echo=F}
-tex_aniT0to1_O0 = sp.latex(aniT0to1_O0)
-```
+\`\`\`{python, echo=F} tex\_aniT0to1\_O0 = sp.latex\(aniT0to1\_O0\)
 
+```text
 \begin{equation}
     `r py$tex_aniT0to1_O0`.
     (\#eq:O0aniT0to1)
@@ -72,10 +66,9 @@ Rearranging \@ref(eq:O0Vb), we find Z\&H95 (2.7a):
 ZH2p7a = sp.Eq(DT_0_1, sp.solve(EqV_O0, DT_0_1)[0])
 ```
 
-```{python, echo=FALSE}
-tex_ZH2p7a = sp.latex(ZH2p7a)
-```
+\`\`\`{python, echo=FALSE} tex\_ZH2p7a = sp.latex\(ZH2p7a\)
 
+```text
 \begin{equation}
   `r py$tex_ZH2p7a`
   (\#eq:O0Zaldarriaga2p7a)
@@ -112,13 +105,9 @@ if sp.collect(temp, LgP(4), evaluate=False).get(LgP(4), False) is not False:
   raise Exception()
 ```
 
-```{python, echo=FALSE}
-tex_EqP_O0_l0 = sp.latex(EqP_O0_l0).replace('=', '&=')
-tex_EqP_O0_l1 = sp.latex(EqP_O0_l1).replace('=', '&=')
-tex_EqP_O0_l2 = sp.latex(EqP_O0_l2).replace('=', '&=')
-tex_EqP_O0_lge3 = sp.latex(EqP_O0_lge3.subs(3, l)).replace('=', '&=')
-```
+\`\`\`{python, echo=FALSE} tex\_EqP\_O0\_l0 = sp.latex\(EqP\_O0\_l0\).replace\('=', '&='\) tex\_EqP\_O0\_l1 = sp.latex\(EqP\_O0\_l1\).replace\('=', '&='\) tex\_EqP\_O0\_l2 = sp.latex\(EqP\_O0\_l2\).replace\('=', '&='\) tex\_EqP\_O0\_lge3 = sp.latex\(EqP\_O0\_lge3.subs\(3, l\)\).replace\('=', '&='\)
 
+```text
 \begin{align}
     `r py$tex_EqP_O0_l0` & (\ell=0) (\#eq:O0Pl0) \\
     `r py$tex_EqP_O0_l1` & (\ell=1) (\#eq:O0Pl1) \\
@@ -133,10 +122,9 @@ temp = sp.Eq(EqP_O0_l0.lhs - EqP_O0_l2.lhs, EqP_O0_l0.rhs - EqP_O0_l2.rhs)  # \@
 O0PT2toP2 = sp.Eq(DP_0_2, sp.solve(temp, DP_0_2)[0])
 ```
 
-```{python, echo=FALSE}
-tex_O0PT2toP2 = sp.latex(O0PT2toP2)
-```
+\`\`\`{python, echo=FALSE} tex\_O0PT2toP2 = sp.latex\(O0PT2toP2\)
 
+```text
 \begin{equation}
     `r py$tex_O0PT2toP2`
     (\#eq:O0PT2toP2)
@@ -149,10 +137,9 @@ temp = EqP_O0_l0.subs(O0PT2toP2.lhs, O0PT2toP2.rhs)  # sub
 O0PT2toP0 = sp.Eq(DP_0_0, sp.solve(temp, DP_0_0)[0])  # solve
 ```
 
-```{python, echo=FALSE}
-tex_O0PT2toP0 = sp.latex(O0PT2toP0)
-```
+\`\`\`{python, echo=FALSE} tex\_O0PT2toP0 = sp.latex\(O0PT2toP0\)
 
+```text
 \begin{equation}
     `r py$tex_O0PT2toP0`
     (\#eq:O0PT2toP0)
@@ -191,13 +178,9 @@ if sp.collect(temp, LgP(4), evaluate=False).get(LgP(4), False) is not False:
   raise Exception()
 ```
 
-```{python, echo=FALSE}
-tex_EqT_O0_l0 = sp.latex(EqT_O0_l0).replace('=', '&=')
-tex_EqT_O0_l1 = sp.latex(EqT_O0_l1).replace('=', '&=')
-tex_EqT_O0_l2 = sp.latex(EqT_O0_l2).replace('=', '&=')
-tex_EqT_O0_lge3 = sp.latex(EqT_O0_lge3).replace('=', '&=')
-```
+\`\`\`{python, echo=FALSE} tex\_EqT\_O0\_l0 = sp.latex\(EqT\_O0\_l0\).replace\('=', '&='\) tex\_EqT\_O0\_l1 = sp.latex\(EqT\_O0\_l1\).replace\('=', '&='\) tex\_EqT\_O0\_l2 = sp.latex\(EqT\_O0\_l2\).replace\('=', '&='\) tex\_EqT\_O0\_lge3 = sp.latex\(EqT\_O0\_lge3\).replace\('=', '&='\)
 
+```text
 \begin{align}
     &`r py$tex_EqT_O0_l0` \quad \text{$\Delta^{(0)}_{T0}$ is a free parameter.} & (\ell = 0) (\#eq:O0Tl0) \\
     `r py$tex_EqT_O0_l1` & \text{see (4.4)} \quad (\ell=1) \\
@@ -213,11 +196,9 @@ temp = sp.Eq(EqT_O0_l2.lhs - EqP_O0_l2.lhs, EqT_O0_l2.rhs - EqP_O0_l2.rhs)
 O0T2P2 = sp.Eq(DP_0_2, sp.solve(temp, DP_0_2)[0])
 ```
 
-```{python, echo=F}
-tex_O0T2P2 = sp.latex(O0T2P2)
-```
+\`\`\`{python, echo=F} tex\_O0T2P2 = sp.latex\(O0T2P2\)
 
-
+```text
 \begin{equation}
     `r py$tex_O0T2P2`
     (\#eq:O0T2P2)
@@ -234,12 +215,9 @@ O0T2sol = sp.Eq(sp.Rational(4,3)*tempRHS, sp.Rational(4,3)*tempLHS)
 O0P2sol = O0T2P2.subs(sp.solve(O0T2sol, DT_0_2, dict=True)[0])
 ```
 
-```{python, echo=F}
-tex_O0T2sol = sp.latex(O0T2sol).replace('=', '&=')
-tex_O0P2sol = sp.latex(O0P2sol).replace('=', '&=')
-```
+\`\`\`{python, echo=F} tex\_O0T2sol = sp.latex\(O0T2sol\).replace\('=', '&='\) tex\_O0P2sol = sp.latex\(O0P2sol\).replace\('=', '&='\)
 
-
+```text
 \begin{align}
     `r py$tex_O0T2sol` & (\#eq:O0T2sol) \\
     `r py$tex_O0P2sol` & (\#eq:O0P2sol)
@@ -251,10 +229,9 @@ Substituting this into \@ref(eq:O0PT2toP0) we again see the incompatibility of t
 O0P0sol = O0PT2toP0.subs(sp.solve(O0T2sol, DT_0_2, dict=True)[0])
 ```
 
-```{python, echo=F}
-tex_O0P0sol = sp.latex(O0P0sol)
-```
+\`\`\`{python, echo=F} tex\_O0P0sol = sp.latex\(O0P0sol\)
 
+```text
 \begin{equation}
     `r py$tex_O0P0sol`
 \end{equation}
@@ -278,12 +255,9 @@ if (
     O0Tsol = sp.Eq(DT_0.subs(dummyL, lge2), 0)
 ```
 
+\`\`\`{python, echo=F} tex\_O0Tsol = sp.latex\(O0Tsol\) tex\_O0Psol = sp.latex\(O0Psol\)
 
-```{python, echo=F}
-tex_O0Tsol = sp.latex(O0Tsol)
-tex_O0Psol = sp.latex(O0Psol)
-```
-
+```text
 \begin{align}
     `r py$tex_ZH2p7a` \quad , \quad `r py$tex_O0Psol` \quad , \quad `r py$tex_O0Tsol`
 \end{align}
@@ -304,5 +278,5 @@ vars['O0Tsol'] = {DT_0: DT_0.doit(i=l).subs(sp.oo, 1).doit()}
 
 with open('src/pickled/03.pkl', 'wb') as file:
     pickle.dump(vars, file)
-
 ```
+

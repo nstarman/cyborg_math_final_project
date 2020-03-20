@@ -1,37 +1,31 @@
-```{r include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(reticulate)
-library(knitr)
-opts_chunk$set(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7')
-```
+# 04-first\_order
 
+\`\`\`{r include=FALSE} knitr::opts\_chunk$set\(echo = TRUE\) library\(reticulate\) library\(knitr\) opts\_chunk$set\(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7'\)
+
+```text
 ```{python echo=FALSE, eval=TRUE}
 from src import *
 ```
 
-# First Order Solution
-(@Zaldarriaga1995 (2.8))
+## First Order Solution
 
-```{python echo=T}
-# load 
-with open('src/pickled/03.pkl', 'rb') as file:
-    vars = pickle.load(file)
+\(@Zaldarriaga1995 \(2.8\)\)
 
-DeltaTDef = vars['DeltaTDef']
-DeltaPDef = vars['DeltaPDef']
+\`\`\`{python echo=T}
 
-EqT = vars['EqT']
-EqP = vars['EqP']
-EqV = vars['EqV']
+## load
 
-aniT0to1 = vars['aniT0to1']
-tex_aniT0to1 = vars['tex_aniT0to1']
-aniT0to1_O0 = vars['aniT0to1_O0']
-tex_aniT0to1_O0 = vars['tex_aniT0to1_O0']
+with open\('src/pickled/03.pkl', 'rb'\) as file: vars = pickle.load\(file\)
 
-O0Tsol = vars['O0Tsol']
-```
+DeltaTDef = vars\['DeltaTDef'\] DeltaPDef = vars\['DeltaPDef'\]
 
+EqT = vars\['EqT'\] EqP = vars\['EqP'\] EqV = vars\['EqV'\]
+
+aniT0to1 = vars\['aniT0to1'\] tex\_aniT0to1 = vars\['tex\_aniT0to1'\] aniT0to1\_O0 = vars\['aniT0to1\_O0'\] tex\_aniT0to1\_O0 = vars\['tex\_aniT0to1\_O0'\]
+
+O0Tsol = vars\['O0Tsol'\]
+
+```text
 The first order expansions of \@ref(eq:T)-\@ref(eq:Vb) are given by 
 
 ```{python}
@@ -40,12 +34,9 @@ EqP_O1 = sp.Eq(EqP.lhs.subs(dummyO, 1), EqP.rhs.subs(dummyO, 0))
 EqV_O1 = sp.Eq(EqV.lhs.subs(dummyO, 1), EqV.rhs.subs(dummyO, 0))
 ```
 
-```{python, echo=FALSE}
-tex_EqT_O1 = sp.latex(EqT_O1).replace('=', '&=')
-tex_EqP_O1 = sp.latex(EqP_O1).replace('=', '&=')
-tex_EqV_O1 = sp.latex(EqV_O1).replace('=', '&=')
-```
+\`\`\`{python, echo=FALSE} tex\_EqT\_O1 = sp.latex\(EqT\_O1\).replace\('=', '&='\) tex\_EqP\_O1 = sp.latex\(EqP\_O1\).replace\('=', '&='\) tex\_EqV\_O1 = sp.latex\(EqV\_O1\).replace\('=', '&='\)
 
+```text
 \begin{align}
     `r py$tex_EqT_O1` & (\#eq:O1T) \\
     `r py$tex_EqP_O1` & (\#eq:O1P) \\
@@ -59,17 +50,16 @@ We have already derived Z\&H95's relation $`r py$tex_aniT0to1`$ above -- the mid
 aniT0to1_O1 = aniT0to1.subs(dummyO, 1)
 ```
 
-```{python, echo=F}
-tex_aniT0to1_O1 = sp.latex(aniT0to1_O1)
-```
+\`\`\`{python, echo=F} tex\_aniT0to1\_O1 = sp.latex\(aniT0to1\_O1\)
 
+```text
 \begin{equation}
     `r py$tex_aniT0to1_O1`.
     (\#eq:O1aniT0to1)
 \end{equation}
-    
+
 In the following derivation we do not need to use \@ref(eq:O1Vb), however note that the RHS of \@ref(eq:O1_Vb)$= \tau_C\left[3R\dot{\Delta}_{T1}^{(0)} + 3\dot{R}\Delta_{T1}^{(0)} + ikR\Psi^{(0)} \right]$, which could be a more convenient form.
-    
+
 Consider \@ref(eq:O1P). Since Z\&H95 find $\Delta_{P} = 0$, The RHS of \@ref(eq:O1P)$=0$. Therefore \@ref(eq:O1_P) may be written as
 
 ```{python}
@@ -77,10 +67,9 @@ EqP_O1_simp = EqP_O1.subs(DP_0, 0).doit()
 EqP_O1_simp = sp.Eq(EqP_O1_simp.rhs, EqP_O1_simp.lhs)
 ```
 
-```{python, echo=F}
-tex_EqP_O1_simp = sp.latex(EqP_O1_simp).replace('=', '&=')
-```
+\`\`\`{python, echo=F} tex\_EqP\_O1\_simp = sp.latex\(EqP\_O1\_simp\).replace\('=', '&='\)
 
+```text
 \begin{align}
     `r py$tex_EqP_O1_simp`
     (\#eq:O1EqPsimp)
@@ -91,7 +80,7 @@ tex_EqP_O1_simp = sp.latex(EqP_O1_simp).replace('=', '&=')
 ```{python}
 if EqP_O1_simp.lhs != 0:  # ensuring EqP_O1_simp.lhs == 0 for simplification
   raise Exception()
-  
+
 alltemp = sp.expand(EqP_O1_simp.rhs)
 tempLHS = EqP_O1_simp.lhs
 
@@ -116,14 +105,9 @@ temp = sp.collect(temp, LgP(3), evaluate=False)[LgP(3)]  # collect powers of LgP
 EqP_O1_lge3 = sp.Eq(tempLHS/7, temp/7)
 ```
 
-```{python echo=F}
-tex_EqP_O1_l0 = sp.latex(EqP_O1_l0).replace('=', '&=')  # l=0
-tex_EqP_O1_l1 = sp.latex(EqP_O1_l1).replace('=', '&=')  # l=1
-tex_EqP_O1_l2 = sp.latex(EqP_O1_l2).replace('=', '&=')  # l=2
-tex_EqP_O1_lge3 = sp.latex(EqP_O1_lge3).replace('=', '&=')  # l>=3
-```
+\`\`\`{python echo=F} tex\_EqP\_O1\_l0 = sp.latex\(EqP\_O1\_l0\).replace\('=', '&='\) \# l=0 tex\_EqP\_O1\_l1 = sp.latex\(EqP\_O1\_l1\).replace\('=', '&='\) \# l=1 tex\_EqP\_O1\_l2 = sp.latex\(EqP\_O1\_l2\).replace\('=', '&='\) \# l=2 tex\_EqP\_O1\_lge3 = sp.latex\(EqP\_O1\_lge3\).replace\('=', '&='\) \# l&gt;=3
 
-
+```text
 \begin{align}
     `r py$tex_EqP_O1_l0` & \text{($\ell=0$)} (\#eq:O1Pl0LHS)  \\
     `r py$tex_EqP_O1_l1` & \text{Z&H96 (2.8c) #2, ($\ell=1$)} (\#eq:ZHeq2p8c2)\\
@@ -138,11 +122,9 @@ temp = sp.Eq(EqP_O1_l0.lhs + EqP_O1_l2.lhs, EqP_O1_l0.rhs + EqP_O1_l2.rhs)
 ZH2p8a1 = sp.Eq(DP_1_2, sp.solve(temp, DP_1_2)[0])
 ```
 
-```{python echo=F}
-tex_ZH2p8a1 = sp.latex(ZH2p8a1)
-```
+\`\`\`{python echo=F} tex\_ZH2p8a1 = sp.latex\(ZH2p8a1\)
 
-
+```text
 \begin{equation}
     `r py$tex_ZH2p8a1`,
     (\#eq:ZHeq2p8a1)
@@ -158,10 +140,9 @@ temp = EqP_O1_l0.subs(temp)  # substitute into EqP_O1_l0
 ZH2p8a2 = sp.Eq(DT_1_2, sp.solve(temp, DT_1_2)[0])
 ```
 
-```{python echo=F}
-tex_ZH2p8a2 = sp.latex(ZH2p8a2)
-```
+\`\`\`{python echo=F} tex\_ZH2p8a2 = sp.latex\(ZH2p8a2\)
 
+```text
 \begin{equation}
      `r py$tex_ZH2p8a2`,
      (\#eq:ZHeq2p8a2)
@@ -186,11 +167,9 @@ tempeq = tempeq.subs(LgP(0), 1)  # for cancelling
 EqT_O1_RHS_exp = sp.simplify(tempeq)
 ```
 
-```{python echo=F}
-tex_EqT_O1_RHS = sp.latex(EqT_O1_RHS)
-tex_EqT_O1_RHS_exp = sp.latex(EqT_O1_RHS_exp)
-```
+\`\`\`{python echo=F} tex\_EqT\_O1\_RHS = sp.latex\(EqT\_O1\_RHS\) tex\_EqT\_O1\_RHS\_exp = sp.latex\(EqT\_O1\_RHS\_exp\)
 
+```text
 \begin{align}
   \rm{RHS} &=`r py$tex_EqT_O1_RHS` & \\
   &= `r py$tex_EqT_O1_RHS_exp` & (\#eq:O1EqTrhs)
@@ -207,11 +186,9 @@ DT_O1exp = DT_Oexp.subs(sp.oo, 1).doit()
 DT_O1expfull = sp.Eq(DT_O1exp.lhs, DT_O1exp.rhs.doit(i=l)) # sub l expansion
 ```
 
-```{python, echo=F}
-tex_DT_O1exp = sp.latex(DT_O1exp)
-tex_DT_O1expfull = sp.latex(DT_O1expfull)
-```
+\`\`\`{python, echo=F} tex\_DT\_O1exp = sp.latex\(DT\_O1exp\) tex\_DT\_O1expfull = sp.latex\(DT\_O1expfull\)
 
+```text
 \begin{equation}
   `r py$tex_DT_O1exp` \rightarrow `r py$tex_DT_O1expfull`
   (\#eq:O1EqTlhs)
@@ -235,15 +212,11 @@ temp_tosub[DT_1] = (
 )  # re-sum, breaking out 1st 2 summands
 
 EqT_O1_LHS = sp.simplify(EqT_O1.lhs.subs(temp_tosub))
-
 ```
 
+\`\`\`{python, echo=F} tex\_EqT\_O1\_LHS = sp.latex\(EqT\_O1\_LHS\)
 
-```{python, echo=F}
-tex_EqT_O1_LHS = sp.latex(EqT_O1_LHS)
-```
-
-
+```text
 \begin{align}
   \rm{LHS} &= `r py$sp$latex(py$EqT_O1$lhs)` \\
            &= `r py$tex_EqT_O1_LHS` & (\#eq:O1EqTlhs)
@@ -277,12 +250,9 @@ if O1_T_lge3_RHS == 0:
 O1_T_lge3 = sp.Eq(O1_T_lge3_LHS, O1_T_lge3_RHS)
 ```
 
-```{python, echo=F}
-tex_EqT_O1_l2 = sp.latex(O1_T_l2).replace('=', '&=')
-tex_EqT_O1_lge3 = sp.latex(O1_T_lge3).replace('=', '&=')
-```
+\`\`\`{python, echo=F} tex\_EqT\_O1\_l2 = sp.latex\(O1\_T\_l2\).replace\('=', '&='\) tex\_EqT\_O1\_lge3 = sp.latex\(O1\_T\_lge3\).replace\('=', '&='\)
 
-
+```text
 \begin{align}
     `r py$sp$latex(py$O1_T_l0_LHS)` &= `r py$sp$latex(py$O1_T_l0_RHS)` & ($\ell=0$) (\#eq:O1Tl0) \\
     `r py$sp$latex(py$O1_T_l1_LHS)` &= `r py$sp$latex(py$O1_T_l1_RHS)` & ($\ell=1$) (\#eq:O1Tl1) \\
@@ -298,11 +268,9 @@ O1_T_l2 = O1_T_l2.subs(sp.solve(ZH2p8a2, DP_1_0, dict=True)[0])
 O1_T_l2 = sp.Eq(DT_1_2, sp.simplify(sp.solve(O1_T_l2, DT_1_2)[0]))
 ```
 
+\`\`\`{python, echo=F} tex\_O1\_T\_l2 = sp.latex\(O1\_T\_l2\)
 
-```{python, echo=F}
-tex_O1_T_l2 = sp.latex(O1_T_l2)
-```
-
+```text
 \begin{equation}
     `r py$tex_O1_T_l2`
     (\#eq:O1Tl2)
@@ -317,17 +285,9 @@ tex_EqP_O1_lge3 = tex_EqP_O1_lge3.replace('&=', '=')
 tex_EqP_O1_l1 = tex_EqP_O1_l1.replace('&=', '=')
 ```
 
+\begin{align} &`r py$tex_ZH2p8a1`, \quad `r py$tex_ZH2p8a2` \quad;\quad `r py$tex_O1_T_l2` \ &`r py$tex_aniT0to1_O1` \ &`r py$tex_EqT_O1_lge3`, \quad `r py$tex_EqP_O1_lge3`  \forall \ell \geq 3 \quad;\quad `r py$tex_EqP_O1_l1` \end{align}
 
-\begin{align}
-    &`r py$tex_ZH2p8a1`, \quad `r py$tex_ZH2p8a2`  \quad;\quad `r py$tex_O1_T_l2` \\
-    &`r py$tex_aniT0to1_O1` \\
-    &`r py$tex_EqT_O1_lge3`, \quad `r py$tex_EqP_O1_lge3` \ \forall \ell \geq 3 \quad;\quad `r py$tex_EqP_O1_l1`
-\end{align}
+\`\`\`{python, echo=F} with open\('src/pickled/04.pkl', 'wb'\) as file: pickle.dump\(vars, file\)
 
+\`\`\`
 
-- - -
-
-```{python, echo=F}
-with open('src/pickled/04.pkl', 'wb') as file:
-    pickle.dump(vars, file)
-```

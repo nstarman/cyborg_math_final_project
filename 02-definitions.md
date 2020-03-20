@@ -1,24 +1,17 @@
-```{r include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(reticulate)
-library(knitr)
-opts_chunk$set(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7')
-```
+# 02-definitions
 
+\`\`\`{r include=FALSE} knitr::opts\_chunk$set\(echo = TRUE\) library\(reticulate\) library\(knitr\) opts\_chunk$set\(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7'\)
+
+```text
 ```{python, echo=F, eval=T}
 from src import *
 ```
 
-```{python, echo=T, eval=T}
-with open('src/pickled/01.pkl', 'rb') as file:
-    vars = pickle.load(file)
+\`\`\`{python, echo=T, eval=T} with open\('src/pickled/01.pkl', 'rb'\) as file: vars = pickle.load\(file\)
 
-rels = vars['rels']
-sols = vars['sols']
-sols_0 = vars['sols_0']
-sols_1 = vars['sols_1']
-```
+rels = vars\['rels'\] sols = vars\['sols'\] sols\_0 = vars\['sols\_0'\] sols\_1 = vars\['sols\_1'\]
 
+```text
 # Definitions
 
 ## Fluctuation Multipole Expansion
@@ -29,11 +22,9 @@ DeltaTDef = sp.Eq(DT, DT.doit(i=l))
 DeltaPDef = sp.Eq(DP, DP.doit(i=l))
 ```
 
-```{python echo=F}
-tex_DeltaTDef = sp.latex(DeltaTDef)
-tex_DeltaPDef = sp.latex(DeltaPDef)
-```
+\`\`\`{python echo=F} tex\_DeltaTDef = sp.latex\(DeltaTDef\) tex\_DeltaPDef = sp.latex\(DeltaPDef\)
 
+```text
 \begin{eqnarray}
     `r py$tex_DeltaTDef` \\
     `r py$tex_DeltaPDef`
@@ -54,12 +45,9 @@ EqV = sp.Eq(3 * DT_a_1 - Vb,
             tauc * Rt * (sp.Derivative(a * Vb, tau) / a + sp.I * k * Psi))
 ```
 
-```{python echo=F}
-tex_EqT = sp.latex(EqT).replace('=', '&=')
-tex_EqP = sp.latex(EqP).replace('=', '&=')
-tex_EqV = sp.latex(EqV).replace('=', '&=')
-```
+\`\`\`{python echo=F} tex\_EqT = sp.latex\(EqT\).replace\('=', '&='\) tex\_EqP = sp.latex\(EqP\).replace\('=', '&='\) tex\_EqV = sp.latex\(EqV\).replace\('=', '&='\)
 
+```text
 \begin{align}
     `r py$tex_EqT` & (\#eq:T) \\
     `r py$tex_EqP` & (\#eq:P) \\
@@ -87,9 +75,9 @@ Putting this together,
 aniT0to1 = sp.Eq( DT_a_0.diff(tau) + dPhi , -sp.I*k*DT_a_1 )
 ```
 
-```{python, echo=F}
-tex_aniT0to1 = sp.latex(aniT0to1)
-```
+\`\`\`{python, echo=F} tex\_aniT0to1 = sp.latex\(aniT0to1\)
+
+```text
 \begin{equation}
     `r py$tex_aniT0to1`
     (\#eq:aniT0to1)
