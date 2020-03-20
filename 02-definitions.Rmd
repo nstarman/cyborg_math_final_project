@@ -1,0 +1,124 @@
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+library(knitr)
+opts_chunk$set(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7')
+```
+
+```{python, echo=F, eval=T}
+from src import *
+```
+
+```{python, echo=T, eval=T}
+with open('src/pickled/01.pkl', 'rb') as file:
+    vars = pickle.load(file)
+
+rels = vars['rels']
+sols = vars['sols']
+sols_0 = vars['sols_0']
+sols_1 = vars['sols_1']
+```
+
+# Definitions
+
+## Fluctuation Multipole Expansion
+
+the multipole expansion of the temperature and polarization fluctuations in a given direction of observation $\hat{n}$ are written as
+```{python}
+DeltaTDef = sp.Eq(DT, DT.doit(i=l))
+DeltaPDef = sp.Eq(DP, DP.doit(i=l))
+```
+
+```{python echo=F}
+tex_DeltaTDef = sp.latex(DeltaTDef)
+tex_DeltaPDef = sp.latex(DeltaPDef)
+```
+
+\begin{eqnarray}
+    `r py$tex_DeltaTDef` \\
+    `r py$tex_DeltaPDef`
+\end{eqnarray}
+
+where $P_\ell$ is the $\ell$th Legendre polynomial. This is @Zaldarriaga1995 Equation 2.1
+
+## @Zaldarriaga1995 (2.6)
+
+The central equation to this project is @Zaldarriaga1995 (2.6), the Tight Coupling Approximation to the the evolution equations for the Fourier mode of wavevector $\hat{k}$ of the gauge-invariant temperature and polarization fluctuation as well as the equation of motion for the baryons.
+
+```{python}
+EqT = sp.Eq(DT - LgP(0) * DT_a_0 - LgP(1) * Vb - sp.Rational(1 / 2) * LgP(2) * Sx,
+            -tauc * (dDT + sp.I * k * LgP(1) * (DT + Psi) + dPhi)).subs(Sx, rels[Sx])
+EqP = sp.Eq(DP + sp.Rational(1 / 2) * (LgP(0) - LgP(2)) * Sx,
+            -tauc * (dDP + sp.I * k * LgP(1) * DP)).subs(Sx, rels[Sx])
+EqV = sp.Eq(3 * DT_a_1 - Vb,
+            tauc * Rt * (sp.Derivative(a * Vb, tau) / a + sp.I * k * Psi))
+```
+
+```{python echo=F}
+tex_EqT = sp.latex(EqT).replace('=', '&=')
+tex_EqP = sp.latex(EqP).replace('=', '&=')
+tex_EqV = sp.latex(EqV).replace('=', '&=')
+```
+
+\begin{align}
+    `r py$tex_EqT` & (\#eq:T) \\
+    `r py$tex_EqP` & (\#eq:P) \\
+    `r py$tex_EqV` & (\#eq:Vb)
+\end{align}
+
+Where all terms have been defined in the previous section.
+
+We are considering a single Fourier mode in the z direction, and so expanding in $P_l(\mu)$. However, the relation between $Y_{l0}$ and $P_l$ is not the same as the relation between $._2Y_{l0}$ and $P_l$. In particular, while $Y_{l0}\propto P_l$, this is not the case for $._2Y_{l0}$. For example $._2Y_{20}\propto \sin^2\theta$ and thus has both an expected $P_2$ contribution and an unexpected $P_0$ contribution.  Thus $\Delta_{P0}$ is not automatically 0. Similarly $\Delta_{P1}$ is not automatically 0. 
+
+- - -
+
+## All-order $\Delta_T$ relation
+
+Look at $\ell=0$ piece of \@ref(eq:T).
+The LHS is 0. 
+The RHS is (dropping $\tau_C$)
+
+\begin{equation}
+    \dot{\Delta}_{T0}+\dot{\Phi} + ik\Delta_{T1}
+\end{equation}
+
+Putting this together,
+```{python}
+aniT0to1 = sp.Eq( DT_a_0.diff(tau) + dPhi , -sp.I*k*DT_a_1 )
+```
+
+```{python, echo=F}
+tex_aniT0to1 = sp.latex(aniT0to1)
+```
+\begin{equation}
+    `r py$tex_aniT0to1`
+    (\#eq:aniT0to1)
+\end{equation}
+
+This is one of Z\&H95's 1st order conclusions. (Middle equation of 2.8.) But actually this holds for $`r py$tex_DT`$ in general, and therefore order by order in $`r py$tex_tauc`$.
+
+
+- - -
+## Passing Variables
+
+```{python, echo=T}
+# save variables
+vars['DeltaTDef'] = DeltaTDef
+vars['DeltaPDef'] = DeltaPDef
+vars['tex_DeltaTDef'] = tex_DeltaTDef
+vars['tex_DeltaPDef'] = tex_DeltaPDef
+
+vars['EqT'] = EqT
+vars['EqP'] = EqP
+vars['EqV'] = EqV
+vars['tex_EqT'] = sp.latex(EqT)
+vars['tex_EqP'] = sp.latex(EqP)
+vars['tex_EqV'] = sp.latex(EqV)
+
+vars['aniT0to1'] = aniT0to1
+vars['tex_aniT0to1'] = tex_aniT0to1
+
+with open('src/pickled/02.pkl', 'wb') as file:
+    pickle.dump(vars, file)
+```
+

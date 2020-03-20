@@ -1,0 +1,333 @@
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+library(knitr)
+opts_chunk$set(engine.path = '/Users/nathanielstarkman/miniconda3/bin/python3.7')
+```
+
+```{python echo=FALSE, eval=TRUE}
+from src import *
+```
+
+# First Order Solution
+(@Zaldarriaga1995 (2.8))
+
+```{python echo=T}
+# load 
+with open('src/pickled/03.pkl', 'rb') as file:
+    vars = pickle.load(file)
+
+DeltaTDef = vars['DeltaTDef']
+DeltaPDef = vars['DeltaPDef']
+
+EqT = vars['EqT']
+EqP = vars['EqP']
+EqV = vars['EqV']
+
+aniT0to1 = vars['aniT0to1']
+tex_aniT0to1 = vars['tex_aniT0to1']
+aniT0to1_O0 = vars['aniT0to1_O0']
+tex_aniT0to1_O0 = vars['tex_aniT0to1_O0']
+
+O0Tsol = vars['O0Tsol']
+```
+
+The first order expansions of \@ref(eq:T)-\@ref(eq:Vb) are given by 
+
+```{python}
+EqT_O1 = sp.Eq(EqT.lhs.subs(dummyO, 1), EqT.rhs.subs(dummyO, 0))
+EqP_O1 = sp.Eq(EqP.lhs.subs(dummyO, 1), EqP.rhs.subs(dummyO, 0))
+EqV_O1 = sp.Eq(EqV.lhs.subs(dummyO, 1), EqV.rhs.subs(dummyO, 0))
+```
+
+```{python, echo=FALSE}
+tex_EqT_O1 = sp.latex(EqT_O1).replace('=', '&=')
+tex_EqP_O1 = sp.latex(EqP_O1).replace('=', '&=')
+tex_EqV_O1 = sp.latex(EqV_O1).replace('=', '&=')
+```
+
+\begin{align}
+    `r py$tex_EqT_O1` & (\#eq:O1T) \\
+    `r py$tex_EqP_O1` & (\#eq:O1P) \\
+    `r py$tex_EqV_O1` & (\#eq:O1Vb)
+\end{align}
+
+
+We have already derived Z\&H95's relation $`r py$tex_aniT0to1`$ above -- the middle equation of his (2.8) -- in \@ref(eq:aniT0to1). Recall that this is true order-by-order, so the first order form is 
+
+```{python}
+aniT0to1_O1 = aniT0to1.subs(dummyO, 1)
+```
+
+```{python, echo=F}
+tex_aniT0to1_O1 = sp.latex(aniT0to1_O1)
+```
+
+\begin{equation}
+    `r py$tex_aniT0to1_O1`.
+    (\#eq:O1aniT0to1)
+\end{equation}
+    
+In the following derivation we do not need to use \@ref(eq:O1Vb), however note that the RHS of \@ref(eq:O1_Vb)$= \tau_C\left[3R\dot{\Delta}_{T1}^{(0)} + 3\dot{R}\Delta_{T1}^{(0)} + ikR\Psi^{(0)} \right]$, which could be a more convenient form.
+    
+Consider \@ref(eq:O1P). Since Z\&H95 find $\Delta_{P} = 0$, The RHS of \@ref(eq:O1P)$=0$. Therefore \@ref(eq:O1_P) may be written as
+
+```{python}
+EqP_O1_simp = EqP_O1.subs(DP_0, 0).doit()
+EqP_O1_simp = sp.Eq(EqP_O1_simp.rhs, EqP_O1_simp.lhs)
+```
+
+```{python, echo=F}
+tex_EqP_O1_simp = sp.latex(EqP_O1_simp).replace('=', '&=')
+```
+
+\begin{align}
+    `r py$tex_EqP_O1_simp`
+    (\#eq:O1EqPsimp)
+\end{align}
+
+\quad Looking at the $\ell$ components of \@ref(eq:O1EqPsimp)
+
+```{python}
+if EqP_O1_simp.lhs != 0:  # ensuring EqP_O1_simp.lhs == 0 for simplification
+  raise Exception()
+  
+alltemp = sp.expand(EqP_O1_simp.rhs)
+tempLHS = EqP_O1_simp.lhs
+
+# l=0
+temp = alltemp.subs(DP_1, DP_1.my_eval(l=0, fullsub=False))  # evaluate DP_1
+temp = sp.collect(temp, LgP(0), evaluate=False)[LgP(0)]  # collect powers of LgP(0)
+EqP_O1_l0 = sp.Eq(2*tempLHS, 2*temp)
+
+# l=1
+temp = alltemp.subs(DP_1, DP_1.my_eval(l=1, fullsub=False))  # evaluate DP_1
+temp = sp.collect(temp, LgP(1), evaluate=False)[LgP(1)]  # collect powers of LgP(1)
+EqP_O1_l1 = sp.Eq(tempLHS/3, temp/3)
+
+# l=2
+temp = alltemp.subs(DP_1, DP_1.my_eval(l=2, fullsub=False))  # evaluate DP_1
+temp = sp.collect(temp, LgP(2), evaluate=False)[LgP(2)]  # collect powers of LgP(2)
+EqP_O1_l2 = sp.Eq(2*tempLHS, 2*temp)
+
+# l=3
+temp = alltemp.subs(DP_1, DP_1.my_eval(l=3, fullsub=False))  # evaluate DP_1
+temp = sp.collect(temp, LgP(3), evaluate=False)[LgP(3)]  # collect powers of LgP(3)
+EqP_O1_lge3 = sp.Eq(tempLHS/7, temp/7)
+```
+
+```{python echo=F}
+tex_EqP_O1_l0 = sp.latex(EqP_O1_l0).replace('=', '&=')  # l=0
+tex_EqP_O1_l1 = sp.latex(EqP_O1_l1).replace('=', '&=')  # l=1
+tex_EqP_O1_l2 = sp.latex(EqP_O1_l2).replace('=', '&=')  # l=2
+tex_EqP_O1_lge3 = sp.latex(EqP_O1_lge3).replace('=', '&=')  # l>=3
+```
+
+
+\begin{align}
+    `r py$tex_EqP_O1_l0` & \text{($\ell=0$)} (\#eq:O1Pl0LHS)  \\
+    `r py$tex_EqP_O1_l1` & \text{Z&H96 (2.8c) #2, ($\ell=1$)} (\#eq:ZHeq2p8c2)\\
+    `r py$tex_EqP_O1_l2` & \text{($\ell=2$)} (\#eq:O1Pl2LHS)\\
+    `r py$tex_EqP_O1_lge3` & \text{Z&H95 (2.8c) #1b ($\ell \geq 3$)} (\#eq:ZHeq2p8c1b)
+\end{align}
+
+Adding the $\ell=0$ and $\ell=2$ relations,
+
+```{python}
+temp = sp.Eq(EqP_O1_l0.lhs + EqP_O1_l2.lhs, EqP_O1_l0.rhs + EqP_O1_l2.rhs)
+ZH2p8a1 = sp.Eq(DP_1_2, sp.solve(temp, DP_1_2)[0])
+```
+
+```{python echo=F}
+tex_ZH2p8a1 = sp.latex(ZH2p8a1)
+```
+
+
+\begin{equation}
+    `r py$tex_ZH2p8a1`,
+    (\#eq:ZHeq2p8a1)
+\end{equation}
+
+which is one of the relationships of Z\&H95 (2.8a).
+
+Substitute \@ref(eq:ZHeq2p8a1) into \@ref(eq:O1Pl0LHS), and solve to find
+
+```{python}
+temp = sp.solve(ZH2p8a1, DP_1_2, dict=True)[0]  # solve for substitution
+temp = EqP_O1_l0.subs(temp)  # substitute into EqP_O1_l0
+ZH2p8a2 = sp.Eq(DT_1_2, sp.solve(temp, DT_1_2)[0])
+```
+
+```{python echo=F}
+tex_ZH2p8a2 = sp.latex(ZH2p8a2)
+```
+
+\begin{equation}
+     `r py$tex_ZH2p8a2`,
+     (\#eq:ZHeq2p8a2)
+\end{equation}
+
+which is one another relationship in Z\&H95 (2.8a).
+
+\vspace{10pt}
+
+Now consider \@ref(eq:O1T). The RHS of \@ref(eq:O1T) may be rewritten as
+
+```{python}
+EqT_O1_RHS = EqT_O1.rhs
+
+# because $\dot{\Delta}_{T}^{(0)} + \dot{\Phi}^{(0)} = -ik\Delta_{T1}^{(0)}$, where $\Delta_{T\ell}^{(0)} = 0
+tempeq = EqT_O1_RHS.subs(O0Tsol)
+tempeq = sp.simplify(tempeq.subs(sp.solve(aniT0to1_O0, dPhi_0, dict=True)[0]))
+# need to cancel terms, so expand and substitute
+tempeq = sp.expand(tempeq)
+tempeq = tempeq.subs(LgP(0)*LgP(1), LgP(1)).subs(LgP(1)*LgP(1), 2*LgP(2)/3 + LgP(0)/3)  # from appendix
+tempeq = tempeq.subs(LgP(0), 1)  # for cancelling
+EqT_O1_RHS_exp = sp.simplify(tempeq)
+```
+
+```{python echo=F}
+tex_EqT_O1_RHS = sp.latex(EqT_O1_RHS)
+tex_EqT_O1_RHS_exp = sp.latex(EqT_O1_RHS_exp)
+```
+
+\begin{align}
+  \rm{RHS} &=`r py$tex_EqT_O1_RHS` & \\
+  &= `r py$tex_EqT_O1_RHS_exp` & (\#eq:O1EqTrhs)
+\end{align}
+
+The LHS of \@ref(eq:O1T) requires a similar treatment. Start by expanding $`r py$tex_DT`$ to first order,
+
+```{python}
+# define general order expansion
+DT_Oexp = sp.Eq(DT, sp.summation(DT.subs(dummyO, i) * tauc**i, (i, 0, sp.oo)))
+
+# take up to O=1
+DT_O1exp = DT_Oexp.subs(sp.oo, 1).doit()
+DT_O1expfull = sp.Eq(DT_O1exp.lhs, DT_O1exp.rhs.doit(i=l)) # sub l expansion
+```
+
+```{python, echo=F}
+tex_DT_O1exp = sp.latex(DT_O1exp)
+tex_DT_O1expfull = sp.latex(DT_O1expfull)
+```
+
+\begin{equation}
+  `r py$tex_DT_O1exp` \rightarrow `r py$tex_DT_O1expfull`
+  (\#eq:O1EqTlhs)
+\end{equation}
+
+Substituting this into the LHS of \@ref(eq:O1T), where we drop the 0th order term since we are in the 1st order expansion.
+
+```{python}
+temp = sp.Eq(  # 1st order
+    DT_O1expfull.lhs.subs(DT, DT_1),  # go to 1st order
+    sp.collect(DT_O1expfull.rhs, tauc, evaluate=False)[tauc]  # go to 1st order
+)
+temp_tosub = sp.solve(temp, DT_1, dict=True)[0]  # solve for DT_1, which want to sub in 
+
+# however, this will not cancel some terms, so need to rewrite
+temp = temp_tosub[DT_1].args[0]  # summand
+temp_ind, temp_from, temp_to = temp_tosub[DT_1].args[1]  # summation index set
+temp_tosub[DT_1] = (
+    temp.subs(l, temp_from) + temp.subs(l, temp_from + 1) + temp.subs(l, temp_from + 2)
+    + sp.Sum(temp, (temp_ind, temp_from+3, temp_to))
+)  # re-sum, breaking out 1st 2 summands
+
+EqT_O1_LHS = sp.simplify(EqT_O1.lhs.subs(temp_tosub))
+
+```
+
+
+```{python, echo=F}
+tex_EqT_O1_LHS = sp.latex(EqT_O1_LHS)
+```
+
+
+\begin{align}
+  \rm{LHS} &= `r py$sp$latex(py$EqT_O1$lhs)` \\
+           &= `r py$tex_EqT_O1_LHS` & (\#eq:O1EqTlhs)
+\end{align}
+
+Putting the LHS and RHS together and looking at the $\ell$ components of \@ref(eq:O1T) individually.
+
+```{python}
+tempLHS = sp.expand(EqT_O1_LHS)
+tempRHS = sp.expand(EqT_O1_RHS_exp)
+# l=0
+O1_T_l0_LHS = sp.collect(tempLHS, LgP(0), evaluate=False).get(LgP(0), 0)
+O1_T_l0_RHS = sp.collect(tempRHS, LgP(0), evaluate=False).get(LgP(0), 0)
+
+# l=1
+O1_T_l1_LHS = sp.collect(tempLHS, LgP(1), evaluate=False).get(LgP(1), 0)
+temp = tempRHS.subs(DT_0, DT_0.my_eval(l=1))
+O1_T_l1_RHS = sp.simplify(sp.collect(temp, LgP(1), evaluate=False).get(LgP(1), 0))
+
+# l=2
+O1_T_l2_LHS = sp.collect(tempLHS, LgP(2), evaluate=False).get(LgP(2), 0)
+O1_T_l2_RHS = sp.simplify(sp.collect(tempRHS, LgP(2), evaluate=False).get(LgP(2), 0))
+O1_T_l2 = sp.Eq(O1_T_l2_LHS, O1_T_l2_RHS)
+
+# l>=3
+temp = sp.simplify(tempLHS - (O1_T_l0_LHS * LgP(0) + O1_T_l1_LHS * LgP(1) + O1_T_l2_LHS * LgP(2)))
+O1_T_lge3_LHS = temp.args[0].subs(l, lge3)  # break apart summation b/c term by term
+O1_T_lge3_RHS = sp.simplify(sp.collect(temp, LgP(3), evaluate=False).get(LgP(3), 0))
+if O1_T_lge3_RHS == 0:
+    O1_T_lge3_LHS = O1_T_lge3_LHS / (2*lge3 + 1) / LgP(lge3)  # just simplifying out constants
+O1_T_lge3 = sp.Eq(O1_T_lge3_LHS, O1_T_lge3_RHS)
+```
+
+```{python, echo=F}
+tex_EqT_O1_l2 = sp.latex(O1_T_l2).replace('=', '&=')
+tex_EqT_O1_lge3 = sp.latex(O1_T_lge3).replace('=', '&=')
+```
+
+
+\begin{align}
+    `r py$sp$latex(py$O1_T_l0_LHS)` &= `r py$sp$latex(py$O1_T_l0_RHS)` & ($\ell=0$) (\#eq:O1Tl0) \\
+    `r py$sp$latex(py$O1_T_l1_LHS)` &= `r py$sp$latex(py$O1_T_l1_RHS)` & ($\ell=1$) (\#eq:O1Tl1) \\
+    `r py$tex_EqT_O1_l2` & ($\ell=2$) (\#eq:O1Tl2pre) \\
+    `r py$tex_EqT_O1_lge3` &\text{Z&H95 (2.8c) #1a} ($\ell \geq 3$)  (\#eq:O1Tlge3) \\
+\end{align}
+
+Now substitute \@ref(eq:ZHeq2p8a1) and \@ref(eq:ZHeq2p8a2) into \@ref(eq:O1Tl2pre)
+
+```{python}
+O1_T_l2 = O1_T_l2.subs(sp.solve(ZH2p8a1, DP_1_2, dict=True)[0])
+O1_T_l2 = O1_T_l2.subs(sp.solve(ZH2p8a2, DP_1_0, dict=True)[0])
+O1_T_l2 = sp.Eq(DT_1_2, sp.simplify(sp.solve(O1_T_l2, DT_1_2)[0]))
+```
+
+
+```{python, echo=F}
+tex_O1_T_l2 = sp.latex(O1_T_l2)
+```
+
+\begin{equation}
+    `r py$tex_O1_T_l2`
+    (\#eq:O1Tl2)
+\end{equation}
+
+Putting all the derived equations together.
+
+```{python, echo=F}
+# need to get 
+tex_EqT_O1_lge3 = tex_EqT_O1_lge3.replace('&=', '=')
+tex_EqP_O1_lge3 = tex_EqP_O1_lge3.replace('&=', '=')
+tex_EqP_O1_l1 = tex_EqP_O1_l1.replace('&=', '=')
+```
+
+
+\begin{align}
+    &`r py$tex_ZH2p8a1`, \quad `r py$tex_ZH2p8a2`  \quad;\quad `r py$tex_O1_T_l2` \\
+    &`r py$tex_aniT0to1_O1` \\
+    &`r py$tex_EqT_O1_lge3`, \quad `r py$tex_EqP_O1_lge3` \ \forall \ell \geq 3 \quad;\quad `r py$tex_EqP_O1_l1`
+\end{align}
+
+
+- - -
+
+```{python, echo=F}
+with open('src/pickled/04.pkl', 'wb') as file:
+    pickle.dump(vars, file)
+```
